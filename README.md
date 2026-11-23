@@ -357,20 +357,57 @@ $$\text{HTTP In (GET /api/tacke)} \longrightarrow \text{Function Node} \longrigh
 
 <h2 align="center">Bước 6: Kết quả Nghiệm thu & Kiểm thử Thực tế</h2>
 
-Kết quả chạy thực tế trên máy:
+### 1. Trạng thái các dịch vụ Container
 ```bash
-# Trạng thái 5 container đang hoạt động
 CONTAINER ID   IMAGE                           STATUS          PORTS                  NAMES
-57886b3d42ab   cloudflare/cloudflared:latest   Up              -                      cloudflared
-ff8079086e94   phpmyadmin:latest               Up              0.0.0.0:8080->80/tcp   phpmyadmin
-d238aa43485c   nginx:latest                    Up              0.0.0.0:80->80/tcp     nginx
-b682d3453155   nodered/node-red:latest         Up              0.0.0.0:1880->1880/tcp nodered
-3ae52169605a   mariadb:10.11                   Up              3306/tcp               mariadb
+76a22eafd1f5   nginx:latest                    Up              0.0.0.0:80->80/tcp     nginx
+8e12f97c92c3   nodered/node-red:latest         Up              0.0.0.0:1880->1880/tcp nodered
+294f63986b4c   mariadb:10.11                   Up              3306/tcp               mariadb
+54e4799b3bf1   phpmyadmin:latest               Up              0.0.0.0:8080->80/tcp   phpmyadmin
 ```
 
 - **Website 1:** `https://banhang.danlinhsiucutie.id.vn`
 - **Website 2:** `https://website2.danlinhsiucutie.id.vn`
 - **API Endpoint:** `https://banhang.danlinhsiucutie.id.vn/api/tacke`
-- **phpMyAdmin:** `http://localhost:8080`
+- **Node-RED Editor:** `https://nodered.danlinhsiucutie.id.vn` (hoặc `http://localhost:1880`)
+- **phpMyAdmin:** `https://phpmyadmin.danlinhsiucutie.id.vn` (hoặc `http://localhost:8080`)
 - **Cloudflare Tunnel:** `linh-cute`
 - **GitHub Repository:** `https://github.com/DanLinh061125/BTVN_PHAT-TRIEN-UNG-DUNG-TREN-NEN-WEB.git`
+
+### 2. Hình ảnh minh chứng hoạt động thực tế trên Cloudflare Domain
+
+#### a. Cấu hình Routes Đường hầm Cloudflare Tunnel (`linh-cute`) cho 4 dịch vụ
+<p align="center">
+  <img src="docs/screenshots/cf_routes_tunnel.jpg" alt="Cấu hình Routes Cloudflare Tunnel" width="850"/>
+  <br><em>Định tuyến an toàn 4 subdomains về máy chủ Nginx, Node-RED và phpMyAdmin</em>
+</p>
+
+#### b. Website 1 Bán Hàng truy cập qua tên miền chính thức (`banhang.danlinhsiucutie.id.vn`)
+<p align="center">
+  <img src="docs/screenshots/live_banhang.png" alt="Website 1 Bán Hàng Domain Thật" width="850"/>
+  <br><em>Website 1 chạy HTTPS qua Cloudflare và gọi Reverse Proxy Nginx</em>
+</p>
+
+#### c. Website 2 Công Nghệ độc lập (`website2.danlinhsiucutie.id.vn`)
+<p align="center">
+  <img src="docs/screenshots/live_website2.png" alt="Website 2 Domain Thật" width="850"/>
+  <br><em>Website 2 hoạt động độc lập trên Virtual Host Nginx</em>
+</p>
+
+#### d. Luồng thiết kế Flow API trên Node-RED (`nodered.danlinhsiucutie.id.vn`)
+<p align="center">
+  <img src="docs/screenshots/live_nodered.jpg" alt="Node-RED Flow Thực tế" width="850"/>
+  <br><em>Flow xử lý HTTP In GET /api/tacke -> Function thống kê -> HTTP Response JSON</em>
+</p>
+
+#### e. Đăng nhập và Quản trị CSDL MariaDB qua phpMyAdmin (`phpmyadmin.danlinhsiucutie.id.vn`)
+<p align="center">
+  <img src="docs/screenshots/live_phpmyadmin.png" alt="phpMyAdmin Live" width="850"/>
+  <br><em>Giao diện quản lý các bảng CSDL và schema shopdb</em>
+</p>
+
+#### f. Chi tiết JSON API trả về qua Reverse Proxy Nginx (`/api/tacke`)
+<p align="center">
+  <img src="docs/screenshots/04_api_tacke_json.png" alt="API JSON Response" width="850"/>
+  <br><em>Dữ liệu JSON chuẩn định dạng theo yêu cầu đề bài môn học</em>
+</p>
