@@ -6,8 +6,13 @@
 .env.local
 .env.*.local
 
-# Docker & Container persistent data
-nodered/data/
+# Node-RED config generated files
+nodered/.config*
+nodered/settings.js
+nodered/package.json
+nodered/node_modules/
+nodered/.sessions.json
+
 nodered_data/
 mariadb/data/
 mariadb_data/
