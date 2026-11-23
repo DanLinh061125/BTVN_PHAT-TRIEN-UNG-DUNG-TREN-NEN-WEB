@@ -1,0 +1,59 @@
+[
+    {
+        "id": "tab_assignment2",
+        "type": "tab",
+        "label": "API Sinh Viên - Tacke",
+        "disabled": false,
+        "info": "Flow API quản lý danh sách sinh viên và tính tổng số tiền đóng quỹ / doanh thu theo yêu cầu Bài tập 2"
+    },
+    {
+        "id": "http_in_tacke",
+        "type": "http in",
+        "z": "tab_assignment2",
+        "name": "GET /api/tacke",
+        "url": "/api/tacke",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 140,
+        "wires": [
+            [
+                "fn_process_students"
+            ]
+        ]
+    },
+    {
+        "id": "fn_process_students",
+        "type": "function",
+        "z": "tab_assignment2",
+        "name": "Thuật toán xử lý thống kê sinh viên & tiền",
+        "func": "// =============================================================================\n// THUẬT TOÁN XỬ LÝ API QUẢN LÝ SINH VIÊN VÀ TÍNH TỔNG SỐ TIỀN\n// Tác giả: Nguyễn Phạm Đan Linh - K59.KMT - TNUT\n// =============================================================================\n\n// 1. Dữ liệu danh sách sinh viên ban đầu (dssv)\nconst dssv = [\n    { name: \"Đan Linh\", money: 123 },\n    { name: \"David\", money: 456 },\n    { name: \"Thầy Cốp\", money: 789 },\n    { name: \"Minh Anh\", money: 250 },\n    { name: \"Văn Hoàng\", money: 320 }\n];\n\n// 2. Thuật toán: Tính tổng số tiền bằng phương thức reduce\nconst totalMoney = dssv.reduce((sum, sv) => sum + sv.money, 0);\n\n// 3. Thuật toán: Đếm tổng số lượng sinh viên trong danh sách\nconst totalStudents = dssv.length;\n\n// 4. Thuật toán: Tìm sinh viên đóng góp / có số tiền cao nhất\nlet maxContributor = dssv[0];\nfor (let i = 1; i < dssv.length; i++) {\n    if (dssv[i].money > maxContributor.money) {\n        maxContributor = dssv[i];\n    }\n}\n\n// 5. Chuẩn bị định dạng JSON trả về theo đúng yêu cầu đề bài giảng viên:\n// - ok: 1\n// - msg: \"thành công\"\n// - dssv: mảng sinh viên gồm name và money\n// Bổ sung thêm các trường thống kê (summary, total_money, count, top_student)\nmsg.payload = {\n    ok: 1,\n    msg: \"thành công\",\n    dssv: dssv,\n    summary: {\n        total_students: totalStudents,\n        total_money: totalMoney,\n        top_student: maxContributor.name,\n        currency: \"VND\",\n        timestamp: new Date().toISOString()\n    }\n};\n\n// Thiết lập Header Content-Type là JSON\nmsg.headers = {\n    'Content-Type': 'application/json; charset=utf-8'\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 140,
+        "wires": [
+            [
+                "http_res_tacke"
+            ]
+        ]
+    },
+    {
+        "id": "http_res_tacke",
+        "type": "http response",
+        "z": "tab_assignment2",
+        "name": "HTTP Response JSON",
+        "statusCode": "200",
+        "headers": {
+            "Content-Type": "application/json; charset=utf-8"
+        },
+        "x": 800,
+        "y": 140,
+        "wires": []
+    }
+]

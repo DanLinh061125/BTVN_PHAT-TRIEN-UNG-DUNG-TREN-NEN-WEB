@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cửa Hàng Công Nghệ - Đan Linh Tech Store</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="container navbar">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-laptop-code"></i>
+                <span>DanLinh TechStore</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#products"><i class="fa-solid fa-box"></i> Sản phẩm</a></li>
+                <li><a href="#api-section"><i class="fa-solid fa-network-wired"></i> API Quỹ Sinh Viên</a></li>
+                <li><a href="https://website2.danlinhsiucutie.id.vn" target="_blank"><i class="fa-solid fa-globe"></i> Website 2</a></li>
+            </ul>
+            <span class="badge"><i class="fa-solid fa-server"></i> Domain: banhang.danlinhsiucutie.id.vn</span>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="hero">
+        <div class="container">
+            <h1>Cửa Hàng Công Nghệ & Bài Tập Thực Hành Web</h1>
+            <p>Hệ thống Web tích hợp Reverse Proxy Nginx, Node-RED API, MariaDB & Cloudflare Tunnel</p>
+        </div>
+    </section>
+
+    <main class="container">
+        <!-- BÀI TẬP 2: KHU VỰC GỌI VÀ HIỂN THỊ API NODE-RED -->
+        <section id="api-section" class="api-section">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">
+                        <i class="fa-solid fa-chart-line" style="color: #4f46e5;"></i>
+                        Bảng Thống Kê Quỹ Sinh Viên (Node-RED API)
+                    </h2>
+                    <p style="color: #64748b; font-size: 0.9rem; margin-top: 4px;">
+                        Được nạp trực tiếp từ <code>/api/tacke</code> (xử lý bởi Flow Node-RED & Reverse Proxy Nginx)
+                    </p>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <div id="api-status"></div>
+                    <button class="btn-refresh" onclick="loadStudentData()">
+                        <i class="fa-solid fa-rotate-right"></i> Tải lại dữ liệu
+                    </button>
+                </div>
+            </div>
+
+            <!-- Thẻ thống kê tổng số lượng & tổng tiền -->
+            <div class="stats-grid">
+                <div class="stat-card total-students">
+                    <span><i class="fa-solid fa-users"></i> Tổng số sinh viên</span>
+                    <h3 id="total-students">--</h3>
+                </div>
+                <div class="stat-card total-money">
+                    <span><i class="fa-solid fa-money-bill-wave"></i> Tổng số tiền quỹ</span>
+                    <h3 id="total-money">-- đ</h3>
+                </div>
+                <div class="stat-card">
+                    <span><i class="fa-solid fa-award"></i> Đóng góp cao nhất</span>
+                    <h3 id="top-student">--</h3>
+                </div>
+            </div>
+
+            <!-- Bảng danh sách sinh viên -->
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">STT</th>
+                            <th>Họ và Tên Sinh Viên</th>
+                            <th>Số Tiền Đóng Góp</th>
+                            <th style="width: 150px;">Trạng Thái</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student-table-body">
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #64748b; padding: 25px;">
+                                <i class="fa-solid fa-spinner fa-spin"></i> Đang kết nối tới API /api/tacke...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- KHU VỰC SẢN PHẨM BÁN HÀNG -->
+        <section id="products">
+            <h2 style="margin-bottom: 20px; font-size: 1.5rem; color: #1e293b;">
+                <i class="fa-solid fa-fire" style="color: #ef4444;"></i> Thiết Bị & Phụ Kiện Nổi Bật
+            </h2>
+
+            <div class="products-grid">
+                <!-- Sản phẩm 1 -->
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=600&q=80" alt="Dell G15">
+                    <div class="product-info">
+                        <div class="product-title">Laptop Dell G15 Gaming</div>
+                        <div class="product-desc">Cấu hình Core i7, RTX 4060, tối ưu cho lập trình web và đồ họa kỹ thuật.</div>
+                        <div class="product-price">22.500.000 đ</div>
+                        <button class="btn-buy" onclick="alert('Đã thêm vào giỏ hàng!')"><i class="fa-solid fa-cart-shopping"></i> Mua ngay</button>
+                    </div>
+                </div>
+
+                <!-- Sản phẩm 2 -->
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=600&q=80" alt="Keyboard">
+                    <div class="product-info">
+                        <div class="product-title">Bàn Phím Cơ Không Dây RGB</div>
+                        <div class="product-desc">Switch cơ học độ bền cao, kết nối Bluetooth đa thiết bị, gõ phím êm ái.</div>
+                        <div class="product-price">1.250.000 đ</div>
+                        <button class="btn-buy" onclick="alert('Đã thêm vào giỏ hàng!')"><i class="fa-solid fa-cart-shopping"></i> Mua ngay</button>
+                    </div>
+                </div>
+
+                <!-- Sản phẩm 3 -->
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=600&q=80" alt="Mouse">
+                    <div class="product-info">
+                        <div class="product-title">Chuột Công Thái Học Không Dây</div>
+                        <div class="product-desc">Thiết kế bảo vệ cổ tay, cảm biến quang học độ nhạy cao 4000 DPI.</div>
+                        <div class="product-price">890.000 đ</div>
+                        <button class="btn-buy" onclick="alert('Đã thêm vào giỏ hàng!')"><i class="fa-solid fa-cart-shopping"></i> Mua ngay</button>
+                    </div>
+                </div>
+
+                <!-- Sản phẩm 4 -->
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80" alt="Headphone">
+                    <div class="product-info">
+                        <div class="product-title">Tai Nghe Chống Ồn Chủ Động</div>
+                        <div class="product-desc">Chống ồn ANC thông minh, pin 35 giờ, chất âm chi tiết cho học tập.</div>
+                        <div class="product-price">1.850.000 đ</div>
+                        <button class="btn-buy" onclick="alert('Đã thêm vào giỏ hàng!')"><i class="fa-solid fa-cart-shopping"></i> Mua ngay</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p><strong>BTVN Phát Triển Ứng Dụng Trên Nền Web</strong> - SV: Nguyễn Phạm Đan Linh - Lớp K59.KMT - TNUT</p>
+            <p style="margin-top: 8px; font-size: 0.85rem;">
+                Virtual Host 1: <a href="https://banhang.danlinhsiucutie.id.vn">banhang.danlinhsiucutie.id.vn</a> | 
+                Tunnel: <code>linh-cute</code>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Script gọi Fetch API -->
+    <script src="js/main.js"></script>
+</body>
+</html>

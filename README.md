@@ -1,302 +1,299 @@
-# BTVN_PHAT-TRIEN-UNG-DUNG-TREN-NEN-WEB
-BTVN môn Phát triển ứng dụng trên nền Web được thực hiện bởi Sinh viên Nguyễn Phạm Đan Linh - Lớp K59.KMT - Trường Đại học Kỹ thuật Công nghiệp Thái Nguyên
-## Yêu cầu Bài tập về nhà môn Lập trình web:
-## Bài tập 1:
-1. giả lập linux os: hyperV, virtualBox, vmware, wsl
-2. cài đặt docker compose trên os đó
-3. cài trên docker compose : các dịch vụ: nginx, nodered, mariadb, phpmyadmin, cloudflared (cần domain xịn)
-4. cấu hình nginx có thể chạy 2 website  với 2 domain khác nhau.
-## Bài tập 2:
-1. sử dụng nodered: dùng node http_in + http_response => tạo api đơn giản
-2. cấu hình nginx để web dùng js gọi đc API trên nodered, thuật toán cho api (tự nghĩ)
-   ví dụ api trả về json:
-   https://tnut.cuong.id.vn/api/tacke
-   trả về json dạng: 
-   {"ok":1,"msg":"thành công","dssv":[{"name":"Cốp","money":123},{"name":"David","money":456}]}
-3. code js vào trang html để gọi đc api trên
-   
-<h1 align="center">Bài làm</h1>
-<h2 align="center">Bước 1: Đăng ký Domain và cấu hình DNS trên Cloudflare</h2>
+# BTVN PHÁT TRIỂN ỨNG DỤNG TRÊN NỀN WEB
 
-### 1. Đăng ký tên miền xịn free .id.vn
-   <img width="1515" height="722" alt="image" src="https://github.com/user-attachments/assets/4413e0f3-b175-4200-b558-bbc88d820b6d" />
- <p align="center"> 01-dang-ky-ten-mien-id-vn.png</p>
- 
-### 2. Đăng ký Cloudflared
-<img width="1535" height="862" alt="image" src="https://github.com/user-attachments/assets/50fba481-3fe1-46d8-8a86-273cac4e630b" />
-<p align="center"> 02-dang-ky-cloudeflared.png</p>
+> **Sinh viên thực hiện:** Nguyễn Phạm Đan Linh  
+> **Lớp:** K59.KMT  
+> **Trường:** Đại học Kỹ thuật Công nghiệp - Đại học Thái Nguyên (TNUT)  
+> **Môn học:** Phát triển ứng dụng trên nền Web  
+> **Domain:** `danlinhsiucutie.id.vn`  
+> **Cloudflare Tunnel:** `linh-cute`  
+> **Website 1 (Bán hàng):** `https://banhang.danlinhsiucutie.id.vn`  
+> **Website 2 (Công nghệ):** `https://website2.danlinhsiucutie.id.vn`  
+> **API Backend:** `https://banhang.danlinhsiucutie.id.vn/api/tacke`  
 
-### 3. Add tên miền vào Cloudflare để Cloudflare quản lý (thay 2 chuỗi)
-<img width="1535" height="862" alt="image" src="https://github.com/user-attachments/assets/0955400d-47ca-465c-b6a2-11540324aacf" />
-<p align="center"> 03-add ten mien vao Cloudflare.png</p>
+---
 
-<img width="1535" height="862" alt="image" src="https://github.com/user-attachments/assets/731faf7a-80e4-490f-a2f0-73280ab9e955" />
-<p align="center"> 04-add ten mien vao Cloudflare.png</p>
+## 1. Giới thiệu & Mục tiêu dự án
 
-### 4. Cài đặt tunnel trên máy tính
-<img width="1535" height="862" alt="image" src="https://github.com/user-attachments/assets/d4d718c3-a7ee-4318-a335-e709879b899a" />
+Dự án này là bài tập thực hành toàn diện môn **Phát triển ứng dụng trên nền Web**, bao gồm 2 bài tập lớn theo yêu cầu của giảng viên:
 
-<p align="center">05-Cai-dat-tunnel-tren-may-tinh.png</p>
+- **Bài tập 1 — Triển khai Môi trường Web Container hóa:**
+  1. Giả lập môi trường Linux OS (WSL2 Ubuntu).
+  2. Cài đặt và cấu hình Docker & Docker Compose trên Linux.
+  3. Triển khai đồng thời 5 dịch vụ cốt lõi: **Nginx**, **Node-RED**, **MariaDB**, **phpMyAdmin**, **Cloudflared**.
+  4. Cấu hình Nginx Virtual Host chạy độc lập 2 website khác nhau với 2 subdomain:
+     - `banhang.danlinhsiucutie.id.vn`
+     - `website2.danlinhsiucutie.id.vn`
+  5. Thiết lập Cloudflare Tunnel (`linh-cute`) kết nối bảo mật từ máy local ra Internet mà không cần mở port modem hoặc IP tĩnh.
 
-<img width="1535" height="862" alt="image" src="https://github.com/user-attachments/assets/376356fb-4dc5-45f5-82b5-8ba13c5f88d8" />
-<p align="center">06-Add-routes-vao-duong-ham.png</p>
+- **Bài tập 2 — Xây dựng API bằng Node-RED & Tích hợp Frontend:**
+  1. Tạo Flow Node-RED chuẩn theo chuỗi: `HTTP In` $\rightarrow$ `Function` $\rightarrow$ `HTTP Response`.
+  2. Xây dựng thuật toán xử lý dữ liệu sinh viên và tính tổng số tiền (Function Node).
+  3. Chuẩn hóa định dạng JSON trả về: `{"ok": 1, "msg": "thành công", "dssv": [...]}`.
+  4. Cấu hình Nginx Reverse Proxy điều hướng `/api/` về Node-RED (tránh lỗi CORS).
+  5. Viết mã JavaScript Fetch API trên giao diện HTML để gọi API, xử lý kết quả, hiển thị danh sách, tính tổng tiền và xử lý lỗi.
 
-<img width="1533" height="862" alt="image" src="https://github.com/user-attachments/assets/31bbf6c9-e7f0-4387-bf5d-32f851a8c438" />
-<p align="center"> 07-Ket-qua-add-duong-ham-vao-routes.png</p>
+---
 
+## 2. Kiến trúc Hệ thống
 
-<h2 align="center">Bước 2: Cài đặt Môi trường Ubuntu & Docker</h2>
+```mermaid
+graph TD
+    User([Người dùng trên Internet]) -->|HTTPS: 443| CF[Cloudflare Edge Network]
+    CF -->|Tunnel: linh-cute| C埠[Container: cloudflared]
+    
+    subgraph Docker Network: webnet
+        C埠 -->|HTTP| NGINX[Container: Nginx Proxy & Web Server]
+        
+        NGINX -->|server_name: banhang...| WEB1[Web 1: Bán Hàng /web/banhang]
+        NGINX -->|server_name: website2...| WEB2[Web 2: Công Nghệ /web/website2]
+        NGINX -->|location /api/| NODERED[Container: Node-RED :1880]
+        
+        PMA[Container: phpMyAdmin :8080] -->|Quản trị CSDL| DB[(Container: MariaDB :3306)]
+    end
+    
+    NODERED -->|API Response JSON| NGINX
+    NGINX -->|Render Data via Fetch API| User
+```
 
-# Yêu cầu:
-Cài đặt môi trường, chọn 1 trong các thứ sau:
-1.Dùng wsl có sẵn, cài đặt ubuntu trên wsl
-2.cài ubuntu trên virtual box
-3.cài ubuntu trên hyperV có sẵn của windows
-4.cài ubuntu trên vmware
+---
 
-Trên ubuntu đó cài đặt:
-1. Cài docker compose
-2. Tạo thư mục làm việc
-3. Vào thư mục làm việc, tạo file docker-compose.yml với y/c tạo các service: nodered, cloudflare, nginx
-Cần token của cloudflare : phải đăng nhập cloudflare để lấy token khi tạo tunnel.
-Cloudflare cũng cần có domain xịn trước khi sử dụng tính năng router (đăng ký domain free *.id.vn free tại nhà cung cấp Mắt bão)
-4. Dùng lệnh để chạy nó: docker compose up -d
+## 3. Cấu trúc Thư mục Dự án
 
-5. Edit cấu hình cho nginx, edit xong dùng lệnh để reload hoặc restart lại nginx để áp dụng cấu hình vừa edit: mục tiêu chạy đc 1 web đơn giản (cần có index.html tại đúng thư mục, đọc kỹ để hiểu thư mục này ở đâu)
+```text
+BTVN_PHAT-TRIEN-UNG-DUNG-TREN-NEN-WEB/
+│
+├── nginx/                          # Cấu hình Web Server Nginx
+│   ├── nginx.conf                  # File cấu hình chính Nginx
+│   └── conf.d/                     # Cấu hình Virtual Hosts
+│       ├── website1.conf           # Vhost cho banhang.danlinhsiucutie.id.vn
+│       └── website2.conf           # Vhost cho website2.danlinhsiucutie.id.vn
+│
+├── web/                            # Mã nguồn 2 Website
+│   ├── banhang/                    # Website 1: Cửa hàng công nghệ & Dashboard API
+│   │   ├── index.html              # Giao diện chính tích hợp Fetch API
+│   │   ├── css/
+│   │   │   └── style.css           # Giao diện hiện đại, responsive
+│   │   ├── js/
+│   │   │   └── main.js             # Logic Fetch API /api/tacke, tính tổng tiền
+│   │   └── images/                 # Tài nguyên hình ảnh
+│   │
+│   └── website2/                   # Website 2: Trang công nghệ & giới thiệu hệ thống
+│       ├── index.html              # Giao diện độc lập website 2
+│       ├── css/
+│       │   └── style.css
+│       ├── js/
+│       └── images/
+│
+├── nodered/                        # Cấu hình & Flow Node-RED
+│   └── flows.json                  # Flow API /api/tacke (HTTP In -> Function -> Response)
+│
+├── mariadb/                        # Cơ sở dữ liệu MariaDB
+│   └── init/
+│       └── 01-init.sql             # Script khởi tạo database `shopdb`, bảng sinh viên và sản phẩm
+│
+├── .env.example                    # File mẫu biến môi trường (không lộ token/mật khẩu)
+├── .gitignore                      # Loại bỏ file nhạy cảm và dữ liệu volume khỏi Git
+├── docker-compose.yml              # Quản lý toàn bộ 5 dịch vụ Docker
+└── README.md                       # Tài liệu hướng dẫn chi tiết
+```
 
-6. Dùng nodered làm backend:
-Tạo node http_in để nhận request , nối với node function để lập trình xử lý đầu vào/ra, node http_response để trả json.
+---
 
-7. Thêm cấu hình cho nginx để nhập http_in của nodered làm api cho js trong index.html gọi tới, nhận về json và hiển thị giá trị trong json lên giao diện.`. Hãy liệt kê chi tiết các bước cần làm để có được kết quả giống thầy: ai ai trên internet cũng truy cập được vào web trên máy của tôi.
-# Bài làm:
-## Phần 1 — Cài môi trường Linux
-Chọn 1 trong 4 cách, nhưng WSL2 là dễ nhất và được khuyên dùng cho bài này:
-Mở PowerShell (Run as Administrator), gõ:
-powershell
+## 4. Hướng dẫn Môi trường Linux & Docker Compose (Bài tập 1)
+
+### Bước 1: Kích hoạt WSL2 và cài đặt Ubuntu
+Trên Windows PowerShell (Run as Administrator):
+```powershell
 wsl --install -d Ubuntu
-Khởi động lại máy nếu được yêu cầu, mở Ubuntu từ Start Menu, đặt username/password cho Linux.
-Kiểm tra: lsb_release -a, uname -a.
-(Nếu chọn VirtualBox/Hyper-V/VMware, bạn tự cài Ubuntu Server hoặc Desktop trong máy ảo như bình thường, rồi các bước dưới đây giống hệt.)
+```
+Khởi động lại máy tính nếu được yêu cầu, sau đó mở Ubuntu từ Start Menu và thiết lập username/password.
 
-<img width="752" height="808" alt="image" src="https://github.com/user-attachments/assets/94c01668-3e2f-401c-bb0b-6a17f3ea60c7" />
-<p align="center"> 09-Cai-ubuntu.png</p>
+Kiểm tra trạng thái:
+```bash
+wsl -l -v
+```
 
-<img width="1177" height="602" alt="image" src="https://github.com/user-attachments/assets/52863e33-68c3-4855-b802-21340776df0b" />
-<p align="center"> 10-Giao-dien-Ubuntu.png</p>
-
-## Phần 2 — Cài Docker & Docker Compose trong Ubuntu
-Các bước cài đặt:
-Trước tiên,cài Docker Desktop trên Windows (không phải trong Ubuntu):
-Tải và cài Docker Desktop cho Windows tại: https://www.docker.com/products/docker-desktop/
-
-<img width="766" height="150" alt="image" src="https://github.com/user-attachments/assets/82346a1d-6c66-4e95-a44e-78fd0429b071" />
-<p align="center"> 11-Cai-dat-Docker</p>
-
-Cài xong, mở Docker Desktop → vào Settings → Resources → WSL Integration → bật (toggle) cho Ubuntu.
-
-<img width="937" height="807" alt="image" src="https://github.com/user-attachments/assets/3f0cf289-276e-4ba0-8437-c15947862ed0" />
-<p align="center"> 12-Bat-toggle-cho-Ubuntu</p>
-
-Sau đó, quay lại cửa sổ Ubuntu, gõ lần lượt từng lệnh (Enter sau mỗi dòng):
-# 1. Cập nhật hệ thống và cài đặt gói phụ thuộc
-sudo apt update
-sudo apt install -y ca-certificates curl gnupg
-
-<img width="1535" height="862" alt="image" src="https://github.com/user-attachments/assets/44b5511c-2bc6-4353-8ed3-cf58bffaa9e9" />
-
-<p align="center"> 12-sudo apt update</p>
-
-<img width="1535" height="862" alt="image" src="https://github.com/user-attachments/assets/ad33a85e-2ca8-4d3b-b586-feb29d2db219" />
-
-<p align="center"> 13-sudo apt install -y ca-certificates curl gnupg
-</p>
-
-# 2. Thêm khóa GPG chính thức của Docker
-sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-sudo chmod a+r /etc/apt/keyrings/docker.gpg
-Thêm kho lưu trữ (repository) Docker vào nguồn APT
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-<img width="1535" height="862" alt="image" src="https://github.com/user-attachments/assets/6a6c0c85-700b-459c-8d37-ce630ac70d9c" />
-
-<p align="center"> 14.Thêm khóa GPG chính thức của Docker</p>
-
-# 4. Cập nhật APT và cài Docker Compose
-sudo apt update
-sudo apt install -y docker-compose-plugin
-
-<img width="1535" height="862" alt="image" src="https://github.com/user-attachments/assets/05cabda4-b893-4714-88bd-aec84b991729" />
-<p align="center"> 15.Cập nhật APT và cài Docker Compose</p>
-
-Kiểm tra lại:
-docker compose version
+### Bước 2: Cài đặt Docker Desktop & Tích hợp WSL2
+1. Tải và cài đặt Docker Desktop cho Windows.
+2. Mở Docker Desktop $\rightarrow$ **Settings** $\rightarrow$ **General** $\rightarrow$ tích chọn **Use the WSL 2 based engine**.
+3. Vào **Settings** $\rightarrow$ **Resources** $\rightarrow$ **WSL Integration** $\rightarrow$ Bật công tắc kích hoạt cho bản phân phối **Ubuntu**.
+4. Kiểm tra trong terminal Ubuntu hoặc PowerShell:
+```bash
 docker --version
+docker compose version
+```
 
-<img width="642" height="202" alt="image" src="https://github.com/user-attachments/assets/b90af1af-c7dd-4254-87a9-2a941d484a09" />
+### Bước 3: Cấu hình biến môi trường
+Trước khi khởi chạy, tạo file `.env` từ `.env.example`:
+```bash
+cp .env.example .env
+```
+Mở file `.env` và điền `TUNNEL_TOKEN` từ Cloudflare Zero Trust của bạn:
+```env
+TUNNEL_TOKEN=eyJhIjoi...
+MYSQL_ROOT_PASSWORD=mariadb_root_pass_2026
+MYSQL_DATABASE=shopdb
+MYSQL_USER=webuser
+MYSQL_PASSWORD=webuser_pass_2026
+```
 
-<p align="center"> 16.Kiểm tra lại</p>
+### Bước 4: Khởi chạy 5 dịch vụ
+Kiểm tra cú pháp cấu hình Docker Compose:
+```bash
+docker compose config
+```
 
-# Phần 3 — Tạo thư mục làm việc & docker-compose.yml
-mkdir -p ~/mysite/nginx/conf.d ~/mysite/www
-cd ~/mysite
-
-<img width="753" height="87" alt="image" src="https://github.com/user-attachments/assets/65493d94-a539-4949-91f0-6c9884580896" />
-
-<p align="center"> 17.</p>
-
-# 3.1. Lấy Cloudflare Tunnel Token
-- Đăng ký domain miễn phí *.id.vn tại Mắt Bão, thêm domain đó vào tài khoản Cloudflare (đổi nameserver theo hướng dẫn Cloudflare). 
-- Vào one.dash.cloudflare.com → Networks → Tunnels → Create a tunnel → chọn loại Cloudflared, đặt tên (vd: mysite-tunnel).
-- Ở bước cài đặt, Cloudflare cho bạn 1 lệnh cài đặt có chứa token (chuỗi dài bắt đầu bằng eyJhIjoi...). Copy token này — không chạy lệnh đó, vì container cloudflared sẽ tự làm việc đó.
-- Ở tab Published application routes (Public Hostname), khai báo:
-Subdomain: ví dụ web
-Domain: domain .id.vn của bạn
-Type: HTTP
-URL: nginx:80 (tên service nginx trong docker-compose, cổng 80 nội bộ)
-*Phần 3.1 này em đã làm ở trên
-
-# 3.2. File docker-compose.yml
-
-Tạo file docker-compose.yml:
-
-yaml
-services:
-  nodered:
-    image: nodered/node-red:latest
-    container_name: nodered
-    restart: unless-stopped
-    volumes:
-      - ./nodered_data:/data
-    networks:
-      - webnet
-
-  nginx:
-    image: nginx:latest
-    container_name: nginx
-    restart: unless-stopped
-    volumes:
-      - ./www:/usr/share/nginx/html
-      - ./nginx/conf.d:/etc/nginx/conf.d
-    networks:
-      - webnet
-
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflared
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run
-    environment:
-      - TUNNEL_TOKEN=DAN-TOKEN-O-DOCKER-CUA-BAN-VAO-DAY
-    networks:
-      - webnet
-
-networks:
-  webnet:
-    driver: bridge
-
-Lưu ý: không expose port ra ngoài (ports:) cho nginx/nodered — vì mọi traffic từ internet đi qua cloudflared, không cần mở port trên router/firewall.
-
-<img width="1535" height="862" alt="image" src="https://github.com/user-attachments/assets/5f214fe7-6086-44a2-b82a-57f9f0ac0cd6" />
-
-<p align="center"> 18.Kết quả.</p>
-
-<img width="1153" height="603" alt="image" src="https://github.com/user-attachments/assets/6a02c001-9df0-4adb-afe4-b164745d51ce" />
-
-<p align="center"> 19.Kết quả.</p>
-
-# Khai báo Public Hostname trên Cloudflare
-Vào cấu hình route của tunnel
-Quay lại trang quản lý tunnel trên https://one.dash.cloudflare.com (Networks → Tunnels), bấm vào tunnel bạn vừa tạo (ví dụ `mysite-tunnel`), rồi vào tab **Published application routes** (có phiên bản cũ gọi là **Public Hostname**).
-
-3.3. Chạy stack
-bash
+Khởi chạy ngầm toàn bộ 5 container:
+```bash
 docker compose up -d
+```
+
+Kiểm tra danh sách và trạng thái container:
+```bash
 docker compose ps
+```
 
-Kiểm tra tunnel: docker compose logs cloudflared (thấy dòng "Registered tunnel connection" là ổn).
+Xem log các dịch vụ khi cần kiểm tra:
+```bash
+docker compose logs -f nginx
+docker compose logs -f cloudflared
+docker compose logs -f nodered
+```
 
-# Phần 4 — Cấu hình Nginx & trang index.html
-Thư mục chứa index.html chính là ~/mysite/www trên máy host (vì đã mount vào /usr/share/nginx/html bên trong container nginx).
-bash
-cat > ~/mysite/www/index.html << 'EOF'
-<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><title>My Site</title></head>
-<body>
-  <h1>Xin chào!</h1>
-  <div id="result">Đang tải...</div>
-  <script>
-    fetch('/api/hello')
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('result').innerText = JSON.stringify(data);
-      });
-  </script>
-</body>
-</html>
-EOF
-File cấu hình nginx nằm ở ~/mysite/nginx/conf.d/default.conf (mount vào /etc/nginx/conf.d trong container). Tạo file:
-bash
-cat > ~/mysite/nginx/conf.d/default.conf << 'EOF'
-server {
-    listen 80;
-    server_name _;
+---
 
-    root /usr/share/nginx/html;
-    index index.html;
+## 5. Cấu hình Nginx 2 Website 2 Domain (Bài tập 1 - Yêu cầu 4)
 
-    location / {
-        try_files $uri $uri/ =404;
-    }
+Nginx được cấu hình 2 Virtual Host riêng biệt trong thư mục `nginx/conf.d/`:
 
-    location /api/ {
-        proxy_pass http://nodered:1880/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
-EOF
-Sau khi sửa cấu hình, reload nginx (không cần khởi động lại toàn bộ container):
-bash
-docker exec nginx nginx -s reload
-hoặc restart hẳn container:
-docker compose restart nginx
-# Phần 5 — Node-RED làm backend
-Mở Node-RED tạm thời qua trình duyệt để lập trình flow. Vì bạn không expose port ra ngoài trong compose, hãy tạm thời mở port để chỉnh sửa (thêm ports: ["1880:1880"] vào service nodered, chạy docker compose up -d, sau khi xong flow thì bỏ dòng port đi vì đã có nginx/cloudflare lo việc truy cập từ ngoài). Rồi truy cập http://localhost:1880 (hoặc IP WSL) trên máy host.
-Kéo node http in: method GET, URL /hello.
-Nối vào node function, code ví dụ:
-javascript
+1. **`website1.conf`**:
+   - `server_name banhang.danlinhsiucutie.id.vn;`
+   - Gốc dữ liệu: `/usr/share/nginx/html/banhang`
+   - Reverse Proxy: Chuyển tiếp toàn bộ `location /api/` sang `http://nodered:1880/api/`
+2. **`website2.conf`**:
+   - `server_name website2.danlinhsiucutie.id.vn;`
+   - Gốc dữ liệu: `/usr/share/nginx/html/website2`
+
+Cả 2 website hoạt động hoàn toàn độc lập, giao diện khác nhau và không bị chồng chéo dữ liệu.
+
+---
+
+## 6. Cấu hình Cloudflare Tunnel `linh-cute` (Bài tập 1 - Yêu cầu 5)
+
+Để người dùng trên Internet truy cập được 2 tên miền, thực hiện cấu hình trên [Cloudflare Zero Trust Dashboard](https://one.dash.cloudflare.com/):
+
+1. Truy cập **Networks** $\rightarrow$ **Tunnels** $\rightarrow$ Chọn tunnel hiện có: **`linh-cute`**.
+2. Chọn tab **Published application routes** (hoặc **Public Hostname**), nhấn **Add a public hostname** cho 2 domain:
+   - **Route 1 (Website Bán Hàng):**
+     - Subdomain: `banhang`
+     - Domain: `danlinhsiucutie.id.vn`
+     - Service Type: `HTTP`
+     - URL: `nginx:80`
+   - **Route 2 (Website 2):**
+     - Subdomain: `website2`
+     - Domain: `danlinhsiucutie.id.vn`
+     - Service Type: `HTTP`
+     - URL: `nginx:80`
+3. Lưu cấu hình. Cloudflare Tunnel sẽ tự động tạo bản ghi CNAME và bảo vệ lưu lượng bằng chứng chỉ SSL/TLS miễn phí.
+
+---
+
+## 7. Xây dựng API Node-RED & JavaScript Fetch API (Bài tập 2)
+
+### Flow Node-RED (`nodered/flows.json`)
+Flow API được triển khai theo mô hình 3 khối:
+$$\text{HTTP In (GET /api/tacke)} \longrightarrow \text{Function Node} \longrightarrow \text{HTTP Response (JSON)}$$
+
+#### Thuật toán trong Function Node:
+Thuật toán quản lý sinh viên và tính tổng số tiền đóng quỹ:
+1. **Khởi tạo danh sách:** Mảng đối tượng sinh viên gồm họ tên (`name`) và số tiền (`money`).
+2. **Tính tổng số tiền:** Sử dụng phương thức `Array.prototype.reduce()` để tính tổng tích lũy tất cả giá trị `money`.
+3. **Thống kê số lượng:** Đếm tổng số lượng bản ghi bằng `dssv.length`.
+4. **Tìm người đóng góp cao nhất:** Duyệt qua danh sách để tìm bản ghi có `money` lớn nhất.
+5. **Định dạng trả về:** Chuẩn hóa đầu ra đúng cấu trúc giảng viên yêu cầu (`ok`, `msg`, `dssv`), kèm khối thống kê `summary`.
+
+```javascript
+// Function Node code tóm tắt:
+const dssv = [
+    { name: "Đan Linh", money: 123 },
+    { name: "David", money: 456 },
+    { name: "Thầy Cốp", money: 789 },
+    { name: "Minh Anh", money: 250 },
+    { name: "Văn Hoàng", money: 320 }
+];
+
+const totalMoney = dssv.reduce((sum, sv) => sum + sv.money, 0);
+const totalStudents = dssv.length;
+
 msg.payload = {
-    message: "Hello from Node-RED!",
-    time: new Date().toISOString()
+    ok: 1,
+    msg: "thành công",
+    dssv: dssv,
+    summary: {
+        total_students: totalStudents,
+        total_money: totalMoney
+    }
 };
 return msg;
-Nối tiếp vào node http response.
-Bấm Deploy (góc trên phải).
+```
 
-Endpoint thật sự sẽ là http://nodered:1880/hello (nội bộ trong mạng docker webnet) — đây là lý do trong nginx conf ở trên dùng proxy_pass http://nodered:1880/;.
-
-# Phần 6 — Nối nginx với endpoint /hello thực tế
-
-Sửa lại location /api/ cho khớp đường dẫn bạn đặt trong Node-RED, ví dụ nếu http-in là /hello:
-
-nginx
-location /api/hello {
-    proxy_pass http://nodered:1880/hello;
-    proxy_set_header Host $host;
+### JSON Trả về từ API (`GET /api/tacke`):
+```json
+{
+  "ok": 1,
+  "msg": "thành công",
+  "dssv": [
+    { "name": "Đan Linh", "money": 123 },
+    { "name": "David", "money": 456 },
+    { "name": "Thầy Cốp", "money": 789 },
+    { "name": "Minh Anh", "money": 250 },
+    { "name": "Văn Hoàng", "money": 320 }
+  ],
+  "summary": {
+    "total_students": 5,
+    "total_money": 1938
+  }
 }
+```
 
-Reload lại nginx như bước 4. Sau đó JS trong index.html gọi fetch('/api/hello') sẽ nhận JSON từ Node-RED và hiển thị lên trang.
+### JavaScript Fetch API trong Website (`web/banhang/js/main.js`)
+Website gọi API qua relative path `/api/tacke` để Nginx tự động reverse proxy tới Node-RED:
+- Sử dụng `fetch('/api/tacke')`.
+- Kiểm tra mã trạng thái `response.ok` và kiểm tra giá trị `data.ok === 1`.
+- Duyệt mảng `data.dssv`, render bảng HTML động, tính tổng tiền và số lượng.
+- Có nút **"Tải lại dữ liệu"** để cập nhật thời gian thực.
+- Có cơ chế bắt lỗi `try...catch` và thông báo lỗi rõ ràng nếu API mất kết nối.
 
-Kiểm tra kết quả cuối cùng
-Trên máy bạn: mở http://localhost (nếu có map port test) — kiểm tra trang tải được, JSON hiển thị đúng.
-Từ điện thoại 4G (không cùng wifi) hoặc nhờ bạn ở xa: truy cập https://web.tencuaban.id.vn — nếu load được trang và thấy JSON, tức là ai trên internet cũng vào được máy bạn qua Cloudflare Tunnel, không cần mở port hay có IP tĩnh.
+---
 
+## 8. Bảng Nghiệm thu Yêu cầu (Checklist)
 
+| Mục kiểm tra | Trạng thái | Ghi chú |
+| :--- | :---: | :--- |
+| **Linux OS / WSL2 Ubuntu** | Hoàn thành | Ubuntu 2.0 trên WSL2 |
+| **Docker & Docker Compose** | Hoàn thành | Docker Compose v2 cấu hình chuẩn |
+| **5 Dịch vụ Docker** | Hoàn thành | Nginx, Node-RED, MariaDB, phpMyAdmin, Cloudflared |
+| **Virtual Host 2 Website** | Hoàn thành | `banhang` & `website2` cấu hình độc lập |
+| **Cloudflare Tunnel `linh-cute`** | Sẵn sàng | Đã cấu hình container, chỉ cần add hostname trên Dash |
+| **API Node-RED (`/api/tacke`)** | Hoàn thành | Flow chuẩn HTTP In $\rightarrow$ Function $\rightarrow$ HTTP Response |
+| **JSON theo mẫu đề bài** | Hoàn thành | Đúng chuẩn `{"ok":1, "msg":"...", "dssv":[...]}` |
+| **JavaScript Fetch API** | Hoàn thành | Gọi API, render bảng, tính tổng tiền, xử lý lỗi |
+| **Bảo mật Git & Token** | Hoàn thành | Đã thêm `.gitignore` và `.env.example`, không push token |
 
+---
 
+## 9. Thao tác Git & Đưa lên GitHub
 
+```bash
+# Kiểm tra trạng thái Git
+git status
+
+# Thêm tất cả các file đã chuẩn hóa
+git add .
+
+# Tạo commit dự án
+git commit -m "Hoan thien toan bo bai tap 1 va bai tap 2 mon PTUD tren nen Web"
+
+# Đẩy code lên nhánh main của repository
+git push -u origin main
+```

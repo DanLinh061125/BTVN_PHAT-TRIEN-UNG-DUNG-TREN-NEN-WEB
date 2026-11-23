@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website 2 - Tech Portfolio & Cloud Platform</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <div class="container nav">
+            <div class="brand">
+                <i class="fa-solid fa-cloud-bolt" style="color: #059669;"></i>
+                <span>Cloud Platform - Website 2</span>
+            </div>
+            <div>
+                <a href="https://banhang.danlinhsiucutie.id.vn" style="color:#059669; font-weight:600; text-decoration:none;">
+                    <i class="fa-solid fa-store"></i> Chuyển sang Website Bán Hàng
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Nền Tảng Đám Mây & Kiến Trúc Dịch Vụ Web</h1>
+            <p>Đây là Website thứ hai độc lập, chạy trên Virtual Host riêng biệt của Nginx tại tên miền <strong>website2.danlinhsiucutie.id.vn</strong> theo đúng yêu cầu đề bài.</p>
+        </div>
+    </section>
+
+    <main class="container">
+        <div class="grid-3">
+            <div class="card">
+                <div class="card-icon"><i class="fa-solid fa-server"></i></div>
+                <h3>Nginx Reverse Proxy</h3>
+                <p>Cấu hình Multi-domain Virtual Host, phân luồng tên miền <code>banhang...</code> và <code>website2...</code> tới các thư mục web độc lập mà không bị trùng lặp.</p>
+                <span class="tag">Mạng & Định tuyến</span>
+            </div>
+
+            <div class="card">
+                <div class="card-icon"><i class="fa-solid fa-diagram-project"></i></div>
+                <h3>Node-RED Microservice</h3>
+                <p>Khối xử lý logic Backend không phụ thuộc mã nguồn cứng, tiếp nhận request qua node HTTP In và trả kết quả JSON qua node HTTP Response.</p>
+                <span class="tag">Backend API</span>
+            </div>
+
+            <div class="card">
+                <div class="card-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                <h3>Cloudflare Tunnel</h3>
+                <p>Bảo mật hệ thống bằng đường hầm mã hóa <code>linh-cute</code>, đưa toàn bộ website ra Internet công cộng với SSL/TLS miễn phí.</p>
+                <span class="tag">Zero Trust Cloudflare</span>
+            </div>
+        </div>
+
+        <div style="background:#ffffff; border-radius:12px; padding:30px; border:1px solid #e2e8f0; margin-bottom:40px;">
+            <h2 style="font-size:1.4rem; margin-bottom:15px; color:#0f172a;">
+                <i class="fa-solid fa-circle-info" style="color:#0ea5e9;"></i> Thông Tin Triển Khai Môi Trường
+            </h2>
+            <ul style="padding-left:20px; line-height:2; color:#475569;">
+                <li><strong>Họ và tên:</strong> Nguyễn Phạm Đan Linh</li>
+                <li><strong>Mã sinh viên / Lớp:</strong> K59.KMT - TNUT</li>
+                <li><strong>Hệ điều hành ảo hóa:</strong> Linux Ubuntu on WSL2</li>
+                <li><strong>Bộ công cụ quản lý container:</strong> Docker Compose v2</li>
+                <li><strong>Tên miền Website 1:</strong> <code>https://banhang.danlinhsiucutie.id.vn</code></li>
+                <li><strong>Tên miền Website 2:</strong> <code>https://website2.danlinhsiucutie.id.vn</code></li>
+                <li><strong>Tunnel Name:</strong> <code>linh-cute</code></li>
+            </ul>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>BTVN Môn Phát Triển Ứng Dụng Trên Nền Web - Đại học Kỹ thuật Công nghiệp Thái Nguyên (TNUT)</p>
+            <p style="margin-top:5px; color:#64748b;">Domain: <code>website2.danlinhsiucutie.id.vn</code></p>
+        </div>
+    </footer>
+
+</body>
+</html>

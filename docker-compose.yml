@@ -1,0 +1,116 @@
+# ==============================================================================
+# DOCKER COMPOSE CONFIGURATION - 5 CORE SERVICES
+# Môn: Phát triển ứng dụng trên nền Web
+# Sinh viên: Nguyễn Phạm Đan Linh - Lớp K59.KMT - TNUT
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # DỊCH VỤ 1: NGINX WEB SERVER & REVERSE PROXY
+  # Chức năng:
+  # - Host 2 website độc lập (banhang & website2) bằng Virtual Host (server_name)
+  # - Reverse proxy các request /api/ sang backend Node-RED
+  # ----------------------------------------------------------------------------
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./web/banhang:/usr/share/nginx/html/banhang:ro
+      - ./web/website2:/usr/share/nginx/html/website2:ro
+    ports:
+      - "80:80"
+    networks:
+      - webnet
+    depends_on:
+      - nodered
+
+  # ----------------------------------------------------------------------------
+  # DỊCH VỤ 2: NODE-RED BACKEND API
+  # Chức năng:
+  # - Xây dựng flow API HTTP In -> Function -> HTTP Response (/api/tacke)
+  # - Xử lý tính toán thống kê sinh viên và số tiền
+  # ----------------------------------------------------------------------------
+  nodered:
+    image: nodered/node-red:latest
+    container_name: nodered
+    restart: unless-stopped
+    volumes:
+      - ./nodered:/data
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    ports:
+      - "1880:1880"
+    networks:
+      - webnet
+
+  # ----------------------------------------------------------------------------
+  # DỊCH VỤ 3: MARIADB DATABASE
+  # Chức năng:
+  # - Lưu trữ cơ sở dữ liệu cho các ứng dụng web
+  # ----------------------------------------------------------------------------
+  mariadb:
+    image: mariadb:10.11
+    container_name: mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-mariadb_root_pass_2026}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-shopdb}
+      MYSQL_USER: ${MYSQL_USER:-webuser}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-webuser_pass_2026}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./mariadb/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - webnet
+
+  # ----------------------------------------------------------------------------
+  # DỊCH VỤ 4: PHPMYADMIN DATABASE MANAGEMENT
+  # Chức năng:
+  # - Giao diện trực quan quản lý CSDL MariaDB qua web
+  # ----------------------------------------------------------------------------
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    ports:
+      - "8080:80"
+    networks:
+      - webnet
+    depends_on:
+      - mariadb
+
+  # ----------------------------------------------------------------------------
+  # DỊCH VỤ 5: CLOUDFLARE TUNNEL (CLOUDFLARED)
+  # Chức năng:
+  # - Kết nối an toàn máy tính nội bộ tới Cloudflare Edge
+  # - Định tuyến 2 tên miền (banhang... và website2...) về Nginx mà không cần mở port mạng
+  # ----------------------------------------------------------------------------
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    networks:
+      - webnet
+    depends_on:
+      - nginx
+
+# ------------------------------------------------------------------------------
+# VOLUMES & NETWORKS
+# ------------------------------------------------------------------------------
+volumes:
+  mariadb_data:
+    driver: local
+
+networks:
+  webnet:
+    driver: bridge
